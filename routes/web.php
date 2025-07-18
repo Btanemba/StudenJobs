@@ -2,67 +2,51 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisteredUserController;
-use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\SearchController;
 use App\Models\User;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Auth\Events\Verified;
 use App\Http\Controllers\Admin\UserCrudController;
+use Illuminate\Support\Facades\Auth;
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
+// Home Route
+Route::get('/', [SearchController::class, 'index'])->name('home');
 
-Route::get('/', function () {
-    return view('home');
-})->name('home');
-
-
+// Admin Login Route
 Route::get('admin/login', function () {
     if (Auth::check()) {
-        // Redirect authenticated users only to the dashboard if logged in
-        return redirect()->route('/admin/dashboard');
+        return redirect()->route('admin.dashboard');
     }
-    return view('auth.login');
+    return view('auth.admin-login'); // Use a separate view for admin login
 })->name('admin.login');
 
-// Route::get('admin/login', function () {
-//     return redirect('/'); // Redirect to your homepage or another page
-// })->name('backpack.auth.login');
+// Custom Login Routes
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [LoginController::class, 'login']);
 
+// Registration Routes
+Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
+Route::post('/register', [RegisteredUserController::class, 'store'])->middleware(['guest']);
 
-Route::post('/register', [RegisteredUserController::class, 'store'])
-     ->middleware(['guest']);
-
-// Email Verification Route
+// Email Verification Routes
 Route::get('/email/verify', function () {
     return view('auth.verify-email');
 })->middleware('auth')->name('verification.notice');
 
-
 Route::get('/email/verify/{id}/{hash}', function (Request $request, $id, $hash) {
     $user = User::findOrFail($id);
-    if (! hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
+    if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
         return abort(403);
     }
     if (!$user->hasVerifiedEmail()) {
         $user->markEmailAsVerified();
         event(new Verified($user));
     }
-    return redirect('/login')->with('status', 'Your email has been verified. Please log in.');
+    return redirect()->route('login')->with('status', 'Your email has been verified. Please log in.');
 })->middleware(['signed'])->name('verification.verify');
 
-
-// Route::get('/dashboard', function () {
-//     return view('dashboard');
-// })->middleware(['auth', 'verified'])->name('dashboard');
-
-// Route::middleware('auth')->group(function () {
-//     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-//     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-//     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-// });
-
-//require __DIR__.'/auth.php';
-
-Route::get('/', [SearchController::class, 'index'])->name('home');
+// Admin Dashboard Route (Example)
+Route::get('/admin/dashboard', function () {
+    return view('admin.dashboard'); // Adjust to your actual dashboard view
+})->middleware(['auth'])->name('admin.dashboard');
