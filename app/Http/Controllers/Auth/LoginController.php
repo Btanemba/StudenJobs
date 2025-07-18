@@ -25,6 +25,11 @@ class LoginController extends Controller
             // Load the authenticated user's person relationship
             $user = Auth::user()->load('person');
 
+             if (!$user->hasVerifiedEmail()) {
+
+            return redirect()->route('verification.notice');
+        }
+
             // Check if first_name, last_name, and gender exist
             if (
                 !$user->person ||

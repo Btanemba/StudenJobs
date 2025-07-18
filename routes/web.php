@@ -47,6 +47,6 @@ Route::get('/email/verify/{id}/{hash}', function (Request $request, $id, $hash) 
 })->middleware(['signed'])->name('verification.verify');
 
 // Admin Dashboard Route (Example)
-Route::get('/admin/dashboard', function () {
-    return view('admin.dashboard'); // Adjust to your actual dashboard view
+Route::get('/admin', function () {
+    return view('admin'); // Adjust to your actual dashboard view
 })->middleware(['auth'])->name('admin.dashboard');
