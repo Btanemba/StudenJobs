@@ -36,6 +36,6 @@ class RegisteredUserController extends Controller
         // $this->guard->login($user, $request->boolean('remember'));
 
         // ✅ Redirect to login page
-        return redirect()->route('login')->with('status', 'Registration successful! Please log in.');
+        return redirect()->route('login')->with('status', 'Registration successful! Please Check Email for Verification.');
     }
 }

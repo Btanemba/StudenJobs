@@ -25,8 +25,8 @@ class UserRequest extends FormRequest
     public function rules()
     {
         $rules = [
-            'person.country' => 'required|string|in:Austria', // Add other countries if needed
-            'person.region' => 'required|string|in:' . implode(',', config('regions')['Austria']), // Adjust this based on selected country
+           'person.country' => 'required|string',
+            'person.region' => 'nullable|string'
         ];
 
         return $rules;

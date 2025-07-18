@@ -63,10 +63,18 @@ return [
     'home_link' => 'admin',
 
     // Menu logo. You can replace this with an <img> tag if you have a logo.
-        'project_logo' => '<div class="text-center mb-4">
-    <img src="/Logo1.PNG" alt="Your Logo" class="w-10 h-7 mx-auto rounded-circle">
-</div>',
+//         'project_logo' => '<div class="text-center mb-4">
+//     <img src="/Logo1.PNG" alt="Your Logo" class="w-10 h-7 mx-auto rounded-circle">
+// </div>',
 
+'project_logo' => function () {
+    if (auth()->check() && auth()->user()->person && auth()->user()->person->profile_picture) {
+        $imageUrl = Storage::disk('public')->url(auth()->user()->person->profile_picture);
+        $altText = e(auth()->user()->person->first_name ?? 'User') . "'s Profile Picture";
+        return '<div class="text-center mb-6"><img src="' . $imageUrl . '" alt="' . $altText . '" class="w-32 h-32 mx-auto rounded-full object-cover"></div>';
+    }
+    return '<div class="text-center mb-6"><img src="/Logo1.PNG" alt="Your Logo" class="w-32 h-32 mx-auto rounded-full"></div>';
+},
 
     // Show / hide breadcrumbs on admin panel pages.
     'breadcrumbs' => false,

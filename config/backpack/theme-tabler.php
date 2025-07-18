@@ -41,6 +41,9 @@ return [
     'styles' => [
         base_path('vendor/backpack/theme-tabler/resources/assets/css/color-adjustments.css'),
         base_path('vendor/backpack/theme-tabler/resources/assets/css/colors.css'),
+
+        // Your custom styles (ensure this path is correct)
+        public_path('css/custom.css'),  // This will load the custom CSS file from the public directory
     ],
 
     /**
@@ -62,7 +65,7 @@ return [
         /**
          * The color mode used by default.
          */
-        'defaultColorMode' => 'light', // system, light, dark
+        'defaultColorMode' => 'dark', // system, light, dark
 
         /**
          * When true, a switch is displayed to let admins choose their favorite theme mode.

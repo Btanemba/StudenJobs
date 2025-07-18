@@ -3,44 +3,30 @@
 namespace App\Models;
 
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Auth;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use CrudTrait;
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
-
         'email',
         'password',
+        'created_by',
+        'updated_by',
+        'active',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -48,23 +34,54 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
     protected static function booted()
     {
         static::created(function ($user) {
-            $user->created_by = Auth::id();
-            $user->save();
+            // Only set created_by if an authenticated user exists
+            if (Auth::check()) {
+                $user->created_by = Auth::id();
+                $user->saveQuietly(); // Avoid triggering updating event
+            }
 
             // Automatically create a person record
             $user->person()->create([]);
         });
 
         static::updating(function ($user) {
-            $user->updated_by = Auth::id();
+            // Only set updated_by if an authenticated user exists
+            if (Auth::check()) {
+                $user->updated_by = Auth::id();
+            }
         });
+
+        static::deleting(function ($user) {
+        // Delete the related person if it exists
+        if ($user->person) {
+            $user->person->delete();
+        }
+    });
     }
 
     public function person()
-{
-    return $this->hasOne(Person::class);
-}
+    {
+        return $this->hasOne(Person::class);
+    }
+
+    public function skills()
+    {
+        return $this->hasMany(Skill::class, 'user_id');
+    }
+
+    public function isAdmin()
+    {
+        return $this->administrator()->exists();
+    }
+
+    public function administrator()
+    {
+        return $this->hasOne(\App\Models\Administrator::class, 'id');
+    }
+
+
 }

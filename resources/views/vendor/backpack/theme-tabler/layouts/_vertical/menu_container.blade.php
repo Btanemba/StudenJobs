@@ -14,7 +14,8 @@
             </ul>
             <h1 class="navbar-brand d-none d-lg-block align-self-center mb-3">
                 <a class="h2 text-decoration-none mb-0" href="{{ url(backpack_theme_config('home_link')) }}" title="{{ backpack_theme_config('project_name') }}">
-                    {!! backpack_theme_config('project_logo') !!}
+                    {{-- {!! backpack_theme_config('project_logo') !!} --}}
+                    {!! value(backpack_theme_config('project_logo')) !!}
                 </a>
             </h1>
             @includeWhen($shortcuts ?? true, backpack_view('layouts.partials.sidebar_shortcuts'))

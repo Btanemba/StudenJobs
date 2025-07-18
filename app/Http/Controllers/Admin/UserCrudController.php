@@ -7,14 +7,10 @@ use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use App\Models\Person;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Admin\ISO3166;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
-
-/**
- * Class UserCrudController
- * @package App\Http\Controllers\Admin
- * @property-read \Backpack\CRUD\app\Library\CrudPanel\CrudPanel $crud
- */
 class UserCrudController extends CrudController
 {
     use \Backpack\CRUD\app\Http\Controllers\Operations\ListOperation;
@@ -23,28 +19,62 @@ class UserCrudController extends CrudController
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
 
-    /**
-     * Configure the CrudPanel object. Apply settings to all operations.
-     *
-     * @return void
-     */
     public function setup()
     {
         CRUD::setModel(\App\Models\User::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/user');
         CRUD::setEntityNameStrings('user', 'users');
+
+        $this->crud->setHeading('
+        <style>
+            .sds-heading {
+                font-size: 2.3vw; /* Use viewport width for scaling */
+                font-weight: bold;
+                color: rgb(135, 206, 235);
+                text-align: center;
+                padding: 1%; /* Relative padding */
+                margin: 0;
+            }
+
+            @media (max-width: 1024px) {
+                .sds-heading {
+                    font-size: 2vw; /* Adjust size for tablets */
+                    padding: 4%; /* Adjust padding */
+                }
+            }
+
+            @media (max-width: 768px) {
+                .sds-heading {
+                    font-size: 2vw; /* Even smaller size for mobile */
+                    padding: 6%; /* Adjust padding for mobile */
+                }
+            }
+        </style>
+        <h1 class="sds-heading">SKILL PRO FINDER</h1>
+    ');
+
+        // For non-admin users, restrict the data they can see and update to their own
+        if (!auth()->user()->isAdmin()) {
+            $this->crud->addClause('where', 'id', '=', auth()->user()->id);
+            $this->crud->denyAccess(['create', 'delete']);
+        }
     }
 
-    /**
-     * Define what happens when the List operation is loaded.
-     *
-     * @see  https://backpackforlaravel.com/docs/crud-operation-list-entries
-     * @return void
-     */
     protected function setupListOperation()
     {
-        CRUD::setFromDb(); // set columns from db columns.
+        // Non-admins only see their own profile
+        if (!backpack_user()->isAdmin()) {
+            $this->crud->addClause('where', 'id', backpack_user()->id);
+        }
 
+        CRUD::disableResponsiveTable();
+        CRUD::enablePersistentTable();
+
+        CRUD::addColumn([
+            'name' => 'email',
+            'label' => 'Email',
+            'type' => 'text',
+        ]);
 
         // Add Person columns to the list view
         CRUD::addColumn([
@@ -72,266 +102,313 @@ class UserCrudController extends CrudController
         ]);
 
         CRUD::addColumn([
-            'name' => 'person.student_id_picture_front',
-            'label' => 'Student ID Picture Front',
-            'type' => 'custom_html',
-            'value' => function ($entry) {
-                $path = $entry->person->student_id_picture_front;
-                if ($path) {
-                    $url = asset('storage/' . $path);
-                    return '<a href="' . $url . '" download><img src="' . $url . '" height="50px" /> Download</a>';
-                }
-                return 'No image uploaded';
-            },
-        ]);
-        CRUD::addColumn([
-            'name' => 'person.student_id_picture_back',
-            'label' => 'Student ID Picture Back',
-            'type' => 'custom_html',
-            'value' => function ($entry) {
-                $path = $entry->person->student_id_picture_back;
-                if ($path) {
-                    $url = asset('storage/' . $path);
-                    return '<a href="' . $url . '" download><img src="' . $url . '" height="50px" /> Download</a>';
-                }
-                return 'No image uploaded';
-            },
+            'name' => 'person.payment_plan',
+            'label' => 'Payment Plan',
+            'type' => 'text',
         ]);
 
-        $this->crud->removeButton( 'preview' );
-        $this->crud->removeButton( 'show' );
-         
-        /**
-         * Columns can be defined using the fluent syntax:
-         * - CRUD::column('price')->type('number');
-         */
+        CRUD::addColumn([
+            'name' => 'active',
+            'label' => 'Active',
+            'type' => 'select_from_array',
+            'options' => [1 => 'Yes', 0 => 'No'],
+        ]);
+
+        $this->crud->removeButton('preview');
+        $this->crud->removeButton('revisions');
+        $this->crud->removeButton('show');
     }
 
-    /**
-     * Define what happens when the Create operation is loaded.
-     *
-     * @see https://backpackforlaravel.com/docs/crud-operation-create
-     * @return void
-     */
     protected function setupCreateOperation()
     {
         CRUD::setValidation(UserRequest::class);
-        //CRUD::setFromDb(); // set fields from db columns.
 
         $regions = config('regions');
 
         CRUD::field('email')
-        ->label('Email')
-        ->wrapper(['class' => 'form-group col-md-12'])
-        ->attributes(['readonly' => 'readonly']);
+            ->label('Email')
+            ->tab('General')
+            ->wrapper(['class' => 'form-group col-md-12'])
+            ->attributes(['readonly' => 'readonly']);
 
+        CRUD::addField([
+            'name'  => 'person.profile_picture',
+            'label' => 'Profile Picture',
+            'type'  => 'upload',
+            'upload' => true,
+            'disk'  => 'public',
+            'tab'   => 'General',
+            'wrapperAttributes' => ['class' => 'form-group col-md-12'],
+        ]);
+
+        // Personal Information Fields
         CRUD::addField([
             'name'  => 'person.first_name',
             'label' => 'First Name',
             'type'  => 'text',
-            'wrapperAttributes' => [
-                'class' => 'form-group col-md-6'
-            ],
+            'tab'   => 'General',
+            'wrapperAttributes' => ['class' => 'form-group col-md-6'],
         ]);
 
         CRUD::addField([
             'name'  => 'person.last_name',
             'label' => 'Last Name',
             'type'  => 'text',
-            'wrapperAttributes' => [
-                'class' => 'form-group col-md-6'
-            ],
+            'tab'   => 'General',
+            'wrapperAttributes' => ['class' => 'form-group col-md-6'],
         ]);
 
         CRUD::addField([
             'name' => 'person.gender',
             'label' => 'Gender',
             'type' => 'select_from_array',
+            'tab'  => 'General',
             'options' => ['Male' => 'Male', 'Female' => 'Female', 'Other' => 'Other'],
             'allows_null' => false,
-            'wrapperAttributes' => [
-        'class' => 'form-group col-md-6'
-    ],
+            'wrapperAttributes' => ['class' => 'form-group col-md-6'],
         ]);
 
         CRUD::addField([
             'name' => 'person.phone',
             'label' => 'Phone',
             'type' => 'text',
-            'wrapperAttributes' => [
-        'class' => 'form-group col-md-6'
-    ],
+            'tab'  => 'General',
+            'wrapperAttributes' => ['class' => 'form-group col-md-6'],
         ]);
 
-        // Add fields for address and university details
+        // Address Fields
         CRUD::addField([
             'name' => 'person.street',
             'label' => 'Street',
             'type' => 'text',
-            'wrapperAttributes' => [
-        'class' => 'form-group col-md-3'
-    ],
+            'tab'  => 'General',
+            'wrapperAttributes' => ['class' => 'form-group col-md-3'],
         ]);
 
         CRUD::addField([
             'name' => 'person.number',
             'label' => 'Number',
             'type' => 'text',
-            'wrapperAttributes' => [
-        'class' => 'form-group col-md-3'
-    ],
+            'tab'  => 'General',
+            'wrapperAttributes' => ['class' => 'form-group col-md-3'],
         ]);
 
         CRUD::addField([
             'name' => 'person.city',
             'label' => 'City',
             'type' => 'text',
-            'wrapperAttributes' => [
-        'class' => 'form-group col-md-3'
-    ],
+            'tab'  => 'General',
+            'wrapperAttributes' => ['class' => 'form-group col-md-3'],
         ]);
 
         CRUD::addField([
             'name' => 'person.zip',
             'label' => 'Zip Code',
             'type' => 'text',
-            'wrapperAttributes' => [
-        'class' => 'form-group col-md-3'
-    ],
+            'tab'  => 'General',
+            'wrapperAttributes' => ['class' => 'form-group col-md-3'],
         ]);
 
-        CRUD::addField([
-            'name' => 'person.country',
-            'label' => 'Country',
-            'type' => 'select_from_array',
-            'options' => ['Austria' => 'Austria'],
-            'allows_null' => false,
-            'attributes' => ['id' => 'person-country'],
-            'wrapperAttributes' => [
-                'class' => 'form-group col-md-6'
-            ],
-        ]);
+        CRUD::field('person.country')
+            ->label('Country of Residence')
+            ->tab('General')
+            ->type('custom_country_select')
+            ->options(collect([
+                'AT' => 'Austria',
+                'CH' => 'Switzerland',
+                'FR' => 'France',
+                'separator' => '──────────',
+            ])->merge(
+                collect((new \League\ISO3166\ISO3166())->all())
+                    ->pluck('name', 'alpha2')
+                    ->sort()
+            )->toArray())
+            ->default('AT')
+            ->wrapper(['class' => 'form-group col-md-5'])
+            ->attributes(['data-separator-key' => 'separator']);
 
         CRUD::addField([
-            'name' => 'person.region',
+            'name'  => 'person.region',
             'label' => 'Region',
-            'type' => 'select_from_array',
-            'options' => config('regions.Austria', []),
-            'allows_null' => false,
-            'attributes' => ['id' => 'person-region'],
-            'wrapperAttributes' => [
-                'class' => 'form-group col-md-6'
-            ],
+            'type'  => 'select_from_array',
+            'tab'   => 'General',
+            'options' => \App\Models\Region::orderBy('name')->pluck('name', 'id')->toArray(),
+            'allows_null' => true,
+            'wrapper' => ['class' => 'form-group col-md-3'],
         ]);
 
+        CRUD::addField([
+            'name'  => 'kanton_toggle_script',
+            'type'  => 'custom_html',
+            'tab'   => 'General',
+            'value' => view('kanton_toggle_script')->render(),
+        ]);
 
+        CRUD::addField([
+            'name'  => 'person.payment_plan',
+            'label' => 'Payment Plan',
+            'type'  => 'select_from_array',
+            'tab'   => 'Payment-Plan',
+            'options' => \App\Models\Selection::where('table', 'payment')
+                ->where('field', 'payment')
+                ->orderBy('name')
+                ->pluck('name', 'code')
+                ->toArray(),
+            'allows_null' => true,
+            'wrapper' => ['class' => 'form-group col-md-3'],
+        ]);
 
+        // University Information Fields
         CRUD::addField([
             'name' => 'person.university_name',
             'label' => 'University Name',
             'type' => 'text',
-            'wrapperAttributes' => [
-        'class' => 'form-group col-md-6'
-    ],
+            'tab'  => 'University Info',
+            'wrapperAttributes' => ['class' => 'form-group col-md-6'],
         ]);
 
         CRUD::addField([
             'name' => 'person.university_address',
             'label' => 'University Address',
             'type' => 'text',
-            'wrapperAttributes' => [
-        'class' => 'form-group col-md-6'
-    ],
+            'tab'  => 'University Info',
+            'wrapperAttributes' => ['class' => 'form-group col-md-6'],
         ]);
 
         CRUD::addField([
             'name' => 'person.start_year',
             'label' => 'Start Year',
             'type' => 'number',
-            'wrapperAttributes' => [
-        'class' => 'form-group col-md-6'
-    ],
+            'tab'  => 'University Info',
+            'wrapperAttributes' => ['class' => 'form-group col-md-6'],
         ]);
 
         CRUD::addField([
             'name' => 'person.finish_year',
             'label' => 'Finish Year',
             'type' => 'number',
-            'wrapperAttributes' => [
-        'class' => 'form-group col-md-6'
-    ],
+            'tab'  => 'University Info',
+            'wrapperAttributes' => ['class' => 'form-group col-md-6'],
         ]);
 
-        // Add file upload for student ID pictures
+        // Student ID Photo Uploads
         CRUD::addField([
-            'name' => 'person.student_id_picture_front',
+            'name'  => 'person.student_id_picture_front',
             'label' => 'Student ID Picture Front',
-            'type' => 'upload',
+            'type'  => 'view',
+            'view'  => 'crud::fields.custom_upload',
+            'tab'   => 'University Info',
             'upload' => true,
-            'disk' => 'public', // Specify the disk for storing the
-            'prefix' => 'uploads/',
+            'disk'  => 'public',
+            'clear' => true,
+            'wrapperAttributes' => ['class' => 'form-group col-md-6'],
+            'value' => function ($entry) {
+                return $entry->person->student_id_picture_front ?? null;
+            }
         ]);
 
         CRUD::addField([
-            'name' => 'person.student_id_picture_back',
+            'name'  => 'person.student_id_picture_back',
             'label' => 'Student ID Picture Back',
-            'type' => 'upload',
+            'type'  => 'view',
+            'view'  => 'crud::fields.custom_upload',
+            'tab'   => 'University Info',
             'upload' => true,
-            'disk' => 'public', // Specify the disk for storing the files
-            'prefix' => 'uploads/',
+            'disk'  => 'public',
+            'clear' => true,
+            'wrapperAttributes' => ['class' => 'form-group col-md-6'],
+            'value' => function ($entry) {
+                return $entry->person->student_id_picture_back ?? null;
+            }
         ]);
+
+        if (backpack_user()->isAdmin()) {
+            CRUD::addField([
+                'name' => 'active',
+                'label' => 'Account Active?',
+                'type' => 'select_from_array',
+                'options' => [1 => 'Yes', 0 => 'No'],
+                'allows_null' => false,
+                'default' => 1,
+                'tab' => 'Active',
+                'wrapperAttributes' => ['class' => 'form-group col-md-12'],
+            ]);
+        }
 
         // Pass regions to the view
         $this->data['regions'] = config('regions');
-
-
-        // Share $regions with the Blade view
         view()->share('regions', $regions);
 
         // Set the custom create view
         $this->crud->setCreateView('vendor.backpack.crud.create');
-
-
     }
 
-    /**
-     * Define what happens when the Update operation is loaded.
-     *
-     * @see https://backpackforlaravel.com/docs/crud-operation-update
-     * @return void
-     */
     protected function setupUpdateOperation()
     {
+        // Non-admins only see their own profile
+        if (!backpack_user()->isAdmin()) {
+            $this->crud->addClause('where', 'id', backpack_user()->id);
+        }
         $this->setupCreateOperation();
     }
 
-
     public function store()
-{
-    // Call the default Backpack store to create the user
-    $response = $this->traitStore();
-    $user = $this->crud->getCurrentEntry();
+    {
+        $response = $this->traitStore();
+        $user = $this->crud->getCurrentEntry();
 
-    $personData = request()->input('person', []);
+        $this->handlePersonData($user);
 
-    // Handle file uploads
-    if (request()->hasFile('person.student_id_picture_front')) {
-        $file = request()->file('person.student_id_picture_front');
-        $personData['student_id_picture_front'] = $file->store('uploads', 'public');
+        return $response;
     }
 
-    if (request()->hasFile('person.student_id_picture_back')) {
-        $file = request()->file('person.student_id_picture_back');
-        $personData['student_id_picture_back'] = $file->store('uploads', 'public');
+    protected function handlePersonData($user)
+    {
+        $personData = request()->input('person', []);
+
+        // Handle file uploads
+        foreach (['student_id_picture_front', 'student_id_picture_back', 'profile_picture'] as $field) {
+            $inputField = "person.{$field}";
+            $clearField = "clear_person.{$field}";
+
+            if (request()->has($clearField)) {
+                // Clear the existing file
+                if ($user->person && $user->person->{$field}) {
+                    Storage::disk('public')->delete($user->person->{$field});
+                    $personData[$field] = null;
+                }
+            } elseif (request()->hasFile($inputField)) {
+                // Debug: Log the file details
+                $file = request()->file($inputField);
+                Log::info("File uploaded: ", ['name' => $file->getClientOriginalName(), 'path' => $file->getPathname()]);
+
+                // Upload new file
+                $originalName = $file->getClientOriginalName();
+                $directory = ($field === 'profile_picture') ? 'profile_pictures' : 'student_ids';
+                $path = $file->storeAs($directory, $originalName, 'public');
+
+                // Debug: Log the stored path
+                Log::info("Stored path: {$path}");
+
+                if ($path) {
+                    $personData[$field] = $path;
+                } else {
+                    Log::error("Failed to store file for field: {$field}");
+                }
+
+                // Delete old file if it exists
+                if ($user->person && $user->person->{$field}) {
+                    Storage::disk('public')->delete($user->person->{$field});
+                }
+            }
+        }
+
+        // Update or create person
+        if ($user->person) {
+            $user->person->update($personData);
+        } else {
+            $person = new Person($personData);
+            $user->person()->save($person);
+        }
     }
-
-    // Save the person
-    $person = new Person($personData);
-    $user->person()->save($person);
-
-    return $response;
-}
-
-
-
 }

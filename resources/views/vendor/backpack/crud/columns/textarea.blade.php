@@ -11,8 +11,15 @@
     }
 
     if(!empty($column['value'])) {
-        $column['text'] = $column['prefix'].$column['value'].$column['suffix'];
+    if(is_array($column['value'])) {
+        $column['value'] = implode(', ', $column['value']); // Convert array to comma-separated string
     }
+    $column['text'] = $column['prefix'].$column['value'].$column['suffix'];
+}
+
+    // if(!empty($column['value'])) {
+    //     $column['text'] = $column['prefix'].$column['value'].$column['suffix'];
+    // }
 @endphp
 
 <span>
