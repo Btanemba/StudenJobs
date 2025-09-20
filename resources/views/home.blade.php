@@ -265,7 +265,7 @@
             <div class="features-content">
                 <span class="box1"><span aria-hidden="true" class="icon-search"></span></span>
                 <h3>Upload Skills</h3>
-                <p>Easily upload your skills and qualifications to showcase your strengths.</p>
+                <p>Client are eager to see what you're offering.Upload your skills and qualifications to showcase your strengths.</p>
             </div>
         </div>
 
@@ -273,52 +273,80 @@
             <div class="features-content">
                 <span class="box1"><span aria-hidden="true" class="fa fa-credit-card"></span></span>
                 <h3>Choose a Payment Plan</h3>
-                <p>Select a payment plan that suits your needs and budget. Flexible options!</p>
+                <p>Select a payment plan that suits your needs and budget. Flexible options!<br> Only when payment are made will a search show your skill profile</p>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="about" id="about">
+    <div class="container">
+        <h2 class="text-center">About SkillProFinder</h2>
+        <div class="about-content">
+            <p>
+                SkillProFinder is a platform designed to connect skilled individuals—especially international students and migrants—with people seeking those services. <br> Whether it’s braiding hair, barbing, makeup, or other hands-on talents, SkillProFinder helps make those skills easily accessible and visible.
+            </p>
+            <p>
+                Many international residents living abroad often find it difficult to locate reliable service providers who understand their cultural or personal needs. On the other hand, individuals who have relocated with valuable skills often struggle to reach the right audience. SkillProFinder bridges this gap by giving skilled providers a space to showcase their talents, and helping clients discover trusted service providers within their community.
+            </p>
+        </div>
+    </div>
+</section>
+<hr>
+
+<section class="pricing" id="pricing">
+    <div class="container">
+        <h2 class="text-center">Subscription Plans</h2>
+        <p class="text-center pricing-description">
+            Unlock the full potential of SkillProFinder by choosing a subscription plan that suits your needs. Registration and profile setup are free, but a subscription ensures your profile is visible to clients searching for your skills. Select from our flexible plans below to showcase your talents to the right audience.
+        </p>
+        <div class="row">
+            <div class="col-md-4 col-sm-4">
+                <div class="package-box">
+                    <div class="package-header">
+                        <i class="fa fa-cog" aria-hidden="true"></i>
+                        <h3>Monthly</h3>
+                    </div>
+                    <div class="package-price">
+                        <h2>Student <sup>€</sup>10</h2>
+                        <h4>Regular <sup>€</sup>15</h4>
+                        <p>Perfect for trying out the platform with full visibility for one month.</p>
+                        <a href="{{ route('register') }}" class="btn contact-btn">Choose Plan</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-4">
+                <div class="package-box">
+                    <div class="package-header">
+                        <i class="fa fa-star-half-o" aria-hidden="true"></i>
+                        <h3>6-Months</h3>
+                    </div>
+                    <div class="package-price">
+                        <h2>Student <sup>€</sup>50</h2>
+                        <h4>Regular <sup>€</sup>80</h4>
+                        <p>Save more with six months of visibility, ideal for consistent exposure.</p>
+                        <a href="{{ route('register') }}" class="btn contact-btn">Choose Plan</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-4">
+                <div class="package-box">
+                    <div class="package-header">
+                        <i class="fa fa-cube" aria-hidden="true"></i>
+                        <h3>Yearly</h3>
+                    </div>
+                    <div class="package-price">
+                        <h2>Student <sup>€</sup>100</h2>
+                        <h4>Regular <sup>€</sup>160</h4>
+                        <p>Best value for long-term visibility, ensuring your skills reach clients all year.</p>
+                        <a href="{{ route('register') }}" class="btn contact-btn">Choose Plan</a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </section>
 
-<section class="pricind">
-    <div class="container">
-        <div class="col-md-4 col-sm-4">
-            <div class="package-box">
-                <div class="package-header">
-                    <i class="fa fa-cog" aria-hidden="true"></i>
-                    <h3>Monthly</h3>
-                </div>
-                <div class="package-price">
-                    <h2>Student <sup>€</sup>10</h2>
-                    <h4>Regular <sup>€</sup>15</h4>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 col-sm-4">
-            <div class="package-box">
-                <div class="package-header">
-                    <i class="fa fa-star-half-o" aria-hidden="true"></i>
-                    <h3>6-Months</h3>
-                </div>
-                <div class="package-price">
-                    <h2>Student <sup>€</sup>50</h2>
-                    <h4>Regular <sup>€</sup>80</h4>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 col-sm-4">
-            <div class="package-box">
-                <div class="package-header">
-                    <i class="fa fa-cube" aria-hidden="true"></i>
-                    <h3>Yearly</h3>
-                </div>
-                <div class="package-price">
-                    <h2>Student <sup>€</sup>100</h2>
-                    <h4>Regular <sup>€</sup>160</h4>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+@include('layouts.faq')
 
 <div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="registerModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -392,9 +420,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-$(document).ready(function () {
-    $('#registerModal').modal('show');
-});
+
 </script>
 </body>
 </html>

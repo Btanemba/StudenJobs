@@ -18,7 +18,8 @@ class Person extends Model
         'first_name', 'last_name', 'gender', 'street', 'number', 'city', 'zip', 'region', 'country',
         'phone', 'remark', 'university_name', 'university_address', 'start_year', 'finish_year',
         'student_id_picture_front', 'student_id_picture_back', 'user_id', 'payment_plan',
-        'profile_picture',
+        'profile_picture','valid_till', 'created_by',
+        'updated_by',
     ];
 
     // Define the relationship with the User model
@@ -26,6 +27,11 @@ class Person extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function invoices()
+{
+    return $this->hasMany(Invoice::class);
+}
 
     public function creator()
     {
@@ -35,6 +41,11 @@ class Person extends Model
     public function updater()
     {
         return $this->belongsTo(User::class, 'updated_by')->with('person');
+    }
+
+    public function getFullNameAttribute()
+    {
+        return trim("{$this->first_name} {$this->last_name}");
     }
 
     /**

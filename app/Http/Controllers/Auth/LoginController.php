@@ -33,18 +33,18 @@ class LoginController extends Controller
             // Check if first_name, last_name, and gender exist
             if (
                 !$user->person ||
-                !$user->person->first_name ||
-                !$user->person->last_name ||
-                !$user->person->gender
+                empty($user->person->first_name) ||
+                empty($user->person->last_name)
+
             ) {
-                return redirect(backpack_url('user/' . $user->id . '/edit'));
+                return redirect(route('user.edit', $user->id));
             }
 
             // Update last_access timestamp
             $user->update(['last_access' => now()]);
 
             // Redirect to the admin user dashboard
-            return redirect('admin/user');
+            return redirect('admin/dashboard');
         }
 
         // If authentication fails, redirect back with error

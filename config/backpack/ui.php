@@ -76,6 +76,9 @@ return [
     return '<div class="text-center mb-6"><img src="/Logo1.PNG" alt="Your Logo" class="w-32 h-32 mx-auto rounded-full"></div>';
 },
 
+// config/backpack/base.php
+//'project_logo' => '<div class="text-center mb-6"><img src="/Logo1.PNG" alt="Your Logo" class="w-32 h-32 mx-auto rounded-full"></div>',
+
     // Show / hide breadcrumbs on admin panel pages.
     'breadcrumbs' => false,
 

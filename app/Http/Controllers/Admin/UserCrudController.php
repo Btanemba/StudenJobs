@@ -90,12 +90,6 @@ class UserCrudController extends CrudController
         ]);
 
         CRUD::addColumn([
-            'name' => 'person.gender',
-            'label' => 'Gender',
-            'type' => 'text',
-        ]);
-
-        CRUD::addColumn([
             'name' => 'person.phone',
             'label' => 'Phone',
             'type' => 'text',
@@ -108,6 +102,13 @@ class UserCrudController extends CrudController
         ]);
 
         CRUD::addColumn([
+            'name' => 'person.valid_till',
+            'label' => 'Valid Till',
+            'type' => 'date',
+            'format' => 'DD-MM-YYYY',
+        ]);
+
+        CRUD::addColumn([
             'name' => 'active',
             'label' => 'Active',
             'type' => 'select_from_array',
@@ -117,6 +118,8 @@ class UserCrudController extends CrudController
         $this->crud->removeButton('preview');
         $this->crud->removeButton('revisions');
         $this->crud->removeButton('show');
+
+       
     }
 
     protected function setupCreateOperation()
@@ -128,7 +131,7 @@ class UserCrudController extends CrudController
         CRUD::field('email')
             ->label('Email')
             ->tab('General')
-            ->wrapper(['class' => 'form-group col-md-12'])
+            ->wrapper(['class' => 'form-group col-md-8'])
             ->attributes(['readonly' => 'readonly']);
 
         CRUD::addField([
@@ -138,7 +141,7 @@ class UserCrudController extends CrudController
             'upload' => true,
             'disk'  => 'public',
             'tab'   => 'General',
-            'wrapperAttributes' => ['class' => 'form-group col-md-12'],
+            'wrapperAttributes' => ['class' => 'form-group col-md-4'],
         ]);
 
         // Personal Information Fields
@@ -244,19 +247,6 @@ class UserCrudController extends CrudController
             'value' => view('kanton_toggle_script')->render(),
         ]);
 
-        CRUD::addField([
-            'name'  => 'person.payment_plan',
-            'label' => 'Payment Plan',
-            'type'  => 'select_from_array',
-            'tab'   => 'Payment-Plan',
-            'options' => \App\Models\Selection::where('table', 'payment')
-                ->where('field', 'payment')
-                ->orderBy('name')
-                ->pluck('name', 'code')
-                ->toArray(),
-            'allows_null' => true,
-            'wrapper' => ['class' => 'form-group col-md-3'],
-        ]);
 
         // University Information Fields
         CRUD::addField([
@@ -322,18 +312,70 @@ class UserCrudController extends CrudController
             }
         ]);
 
-        if (backpack_user()->isAdmin()) {
-            CRUD::addField([
-                'name' => 'active',
-                'label' => 'Account Active?',
-                'type' => 'select_from_array',
-                'options' => [1 => 'Yes', 0 => 'No'],
-                'allows_null' => false,
-                'default' => 1,
-                'tab' => 'Active',
-                'wrapperAttributes' => ['class' => 'form-group col-md-12'],
-            ]);
-        }
+        CRUD::addField([
+            'name' => 'active',
+            'label' => 'Account Active?',
+            'type' => 'select_from_array',
+            'options' => [1 => 'Yes', 0 => 'No'],
+            'allows_null' => false,
+            'default' => 1,
+            'tab' => 'Payment Plan',
+            'wrapperAttributes' => ['class' => 'form-group col-md-6'],
+
+            // Make read-only for non-admins
+            'attributes' => backpack_user()->isAdmin()
+                ? []
+                : ['readonly' => 'readonly', 'disabled' => 'disabled'],
+        ]);
+
+              CRUD::addField([
+            'name'  => 'person.payment_plan',
+            'label' => 'Payment Plan',
+            'type'  => 'select_from_array',
+            'tab' => 'Payment Plan',
+            'options' => \App\Models\Selection::where('table', 'payment')
+                ->where('field', 'payment')
+                ->orderBy('order')
+                ->pluck('name', 'code')
+                ->toArray(),
+            'allows_null' => true,
+            'wrapper' => ['class' => 'form-group col-md-3'],
+        ]);
+
+        CRUD::addField([
+            'name'  => 'person.valid_till',
+            'label' => 'Valid Till',
+            'type'  => 'select_from_array',
+           'tab' => 'Payment Plan',
+             'wrapperAttributes' => ['class' => 'form-group col-md-3'],
+            'options' => collect([
+                'January',
+                'February',
+                'March',
+                'April',
+                'May',
+                'June',
+                'July',
+                'August',
+                'September',
+                'October',
+                'November',
+                'December'
+            ])->mapWithKeys(function ($month) {
+                $year = now()->year;
+                $dateObj = \Carbon\Carbon::createFromFormat('F Y', "$month $year")->endOfMonth();
+                $date    = $dateObj->toDateString();
+                $label   = $dateObj->format('d-F-Y');
+                return [$date => $label];
+            })->toArray(),
+
+            // Make field readonly/disabled for non-admins
+            'attributes' => backpack_user()->isAdmin()
+                ? []
+                : ['readonly' => 'readonly', 'disabled' => 'disabled'],
+        ]);
+
+
 
         // Pass regions to the view
         $this->data['regions'] = config('regions');

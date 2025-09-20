@@ -18,12 +18,12 @@ Route::get('admin/login', function () {
     if (Auth::check()) {
         return redirect()->route('admin.dashboard');
     }
-    return view('auth.admin-login'); // Use a separate view for admin login
+    return view('auth.login');
 })->name('admin.login');
 
 // Custom Login Routes
-Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [LoginController::class, 'login']);
+// Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+// Route::post('/login', [LoginController::class, 'login']);
 
 // Registration Routes
 Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
@@ -46,7 +46,13 @@ Route::get('/email/verify/{id}/{hash}', function (Request $request, $id, $hash) 
     return redirect()->route('login')->with('status', 'Your email has been verified. Please log in.');
 })->middleware(['signed'])->name('verification.verify');
 
-// Admin Dashboard Route (Example)
-Route::get('/admin', function () {
-    return view('admin'); // Adjust to your actual dashboard view
-})->middleware(['auth'])->name('admin.dashboard');
+ Route::get('/admin/dashboard', function () {
+    return view('vendor.backpack.ui.dashboard');
+})->middleware(['auth', 'verified'])->name('admin.dashboard');
+
+Route::get('/terms', function () {
+    return view('terms');
+})->name('terms');
+Route::get('/privacy', function () {
+    return view('privacy');
+})->name('privacy');

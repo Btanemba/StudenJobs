@@ -18,8 +18,14 @@
         {{-- Regular user menu items --}}
         <x-backpack::menu-item title="My Profile" icon="la la-user" :link="backpack_url('user/' . auth()->id() . '/edit')" />
         <x-backpack::menu-item title="My Skills" icon="la la-cogs" :link="backpack_url('skill?user_id=' . auth()->id())" />
+
+        {{-- <x-backpack::menu-item title="Invoices" icon="la la-file-invoice" :link="backpack_url('invoice')" /> --}}
+
     @endif
 @endauth
+
+<x-backpack::menu-item title="Invoices" icon="la la-file-invoice" :link="backpack_url('invoice')" />
+
 
 <li class="nav-item">
     <a class="nav-link" href="{{ route('logout') }}"
