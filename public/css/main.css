@@ -1839,6 +1839,7 @@ Existing modal styles .modal-content {
     font-size: 24px;
     margin: 0;
     display: inline-block;
+     color: #fff;
 }
 .package-price {
     text-align: center;

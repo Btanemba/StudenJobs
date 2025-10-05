@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Requests\UserRequest;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
+use App\Http\Controllers\Admin\Operations\EmailOperation;
 use App\Models\Person;
 use App\Models\User;
 use App\Http\Controllers\Admin\ISO3166;
@@ -18,6 +19,7 @@ class UserCrudController extends CrudController
     use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
+    use EmailOperation;
 
     public function setup()
     {
@@ -53,7 +55,7 @@ class UserCrudController extends CrudController
         <h1 class="sds-heading">SKILL PRO FINDER</h1>
     ');
 
-        // For non-admin users, restrict the data they can see and update to their own
+             // For non-admin users, restrict the data they can see and update to their own
         if (!auth()->user()->isAdmin()) {
             $this->crud->addClause('where', 'id', '=', auth()->user()->id);
             $this->crud->denyAccess(['create', 'delete']);
@@ -67,6 +69,11 @@ class UserCrudController extends CrudController
             $this->crud->addClause('where', 'id', backpack_user()->id);
         }
 
+        // $this->crud->addButtonFromView('line', 'email', 'email', 'beginning');
+        if (auth()->check() && auth()->user()->isAdmin()) {
+            $this->crud->addButtonFromView('line', 'email', 'email', 'beginning');
+        }
+
         CRUD::disableResponsiveTable();
         CRUD::enablePersistentTable();
 
@@ -77,11 +84,11 @@ class UserCrudController extends CrudController
         ]);
 
         // Add Person columns to the list view
-        CRUD::addColumn([
-            'name' => 'person.first_name',
-            'label' => 'First Name',
-            'type' => 'text',
-        ]);
+        // CRUD::addColumn([
+        //     'name' => 'person.first_name',
+        //     'label' => 'First Name',
+        //     'type' => 'text',
+        // ]);
 
         CRUD::addColumn([
             'name' => 'person.last_name',
@@ -119,7 +126,7 @@ class UserCrudController extends CrudController
         $this->crud->removeButton('revisions');
         $this->crud->removeButton('show');
 
-       
+
     }
 
     protected function setupCreateOperation()
@@ -131,8 +138,25 @@ class UserCrudController extends CrudController
         CRUD::field('email')
             ->label('Email')
             ->tab('General')
-            ->wrapper(['class' => 'form-group col-md-8'])
+            ->wrapper(['class' => 'form-group col-md-12'])
             ->attributes(['readonly' => 'readonly']);
+
+         $entry = $this->crud->getCurrentEntry(); // get current record being edited
+
+        $htmlPreview = '<small>No profile picture uploaded.</small>';
+        if ($entry && $entry->person && $entry->person->profile_picture) {
+            $htmlPreview = '<img src="' . asset('storage/' . $entry->person->profile_picture) . '"
+        width="100" style="border-radius:8px">';
+        }
+
+        CRUD::addField([
+            'name'  => 'current_profile_picture',
+            'label' => 'Current Profile Picture',
+            'type'  => 'custom_html',
+            'value' => $htmlPreview,   // now it's a string, not a closure
+            'tab'   => 'General',
+            'wrapperAttributes' => ['class' => 'form-group col-md-6'],
+        ]);
 
         CRUD::addField([
             'name'  => 'person.profile_picture',
@@ -141,7 +165,7 @@ class UserCrudController extends CrudController
             'upload' => true,
             'disk'  => 'public',
             'tab'   => 'General',
-            'wrapperAttributes' => ['class' => 'form-group col-md-4'],
+            'wrapperAttributes' => ['class' => 'form-group col-md-6'],
         ]);
 
         // Personal Information Fields
@@ -168,6 +192,19 @@ class UserCrudController extends CrudController
             'tab'  => 'General',
             'options' => ['Male' => 'Male', 'Female' => 'Female', 'Other' => 'Other'],
             'allows_null' => false,
+            'wrapperAttributes' => ['class' => 'form-group col-md-6'],
+        ]);
+
+        CRUD::addField([
+            'name'  => 'person.preferred_contact_method',
+            'label' => 'Preferred Contact Method',
+            'type'  => 'select_from_array',
+            'options' => [
+                'email' => 'Email',
+                'phone' => 'Phone/WhatsApp',
+            ],
+            'default' => 'email',
+            'tab'   => 'General',
             'wrapperAttributes' => ['class' => 'form-group col-md-6'],
         ]);
 
@@ -227,7 +264,7 @@ class UserCrudController extends CrudController
                     ->sort()
             )->toArray())
             ->default('AT')
-            ->wrapper(['class' => 'form-group col-md-5'])
+            ->wrapper(['class' => 'form-group col-md-3'])
             ->attributes(['data-separator-key' => 'separator']);
 
         CRUD::addField([

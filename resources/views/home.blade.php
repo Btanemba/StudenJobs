@@ -11,7 +11,7 @@
         }
 
         .modal-header.package-header {
-            background-color: #242c36;
+            background-color: #0f1113;
             color: #fff;
             text-align: center;
             padding: 20px;
@@ -27,7 +27,9 @@
             font-size: 24px;
             margin: 0;
             display: inline-block;
+            color: #fff;
         }
+
 
         .modal-body.package-price {
             text-align: center;
@@ -85,13 +87,13 @@
             <h2>At Your Service</h2>
             <form action="{{ route('home') }}" method="GET" class="search-form" id="searchForm">
                 @php
-                    $skills = \App\Models\Selection::where('table', 'Skills')
-                        ->where('field', 'Un-skill')
-                        ->orderBy('name')
-                        ->pluck('name', 'code')
-                        ->toArray();
+$skills = \App\Models\Selection::where('table', 'Skills')
+    ->where('field', 'Un-skill')
+    ->orderBy('name')
+    ->pluck('name', 'code')
+    ->toArray();
 
-                    $austrianRegions = \App\Models\Region::orderBy('name')->pluck('name', 'id')->toArray();
+$austrianRegions = \App\Models\Region::orderBy('name')->pluck('name', 'id')->toArray();
                 @endphp
 
                 <fieldset>
@@ -109,16 +111,16 @@
                             <select name="country" id="countrySelect" class="form-control selectpicker">
                                 <option value="">Select Country</option>
                                 @php
-                                    $countries = collect([
-                                        'AT' => 'Austria',
-                                        'CH' => 'Switzerland',
-                                        'FR' => 'France',
-                                        'separator' => '──────────',
-                                    ])->merge(
-                                        collect((new \League\ISO3166\ISO3166())->all())
-                                            ->pluck('name', 'alpha2')
-                                            ->sort()
-                                    );
+$countries = collect([
+    'AT' => 'Austria',
+    'CH' => 'Switzerland',
+    'FR' => 'France',
+    'separator' => '──────────',
+])->merge(
+        collect((new \League\ISO3166\ISO3166())->all())
+            ->pluck('name', 'alpha2')
+            ->sort()
+    );
                                 @endphp
 
                                 @foreach($countries as $code => $name)
@@ -133,7 +135,7 @@
 
                         <div class="form-group col-md-3">
                             <select name="region_id" id="regionSelect" class="form-control selectpicker" {{ request('country') != 'AT' ? 'disabled' : '' }}>
-                                <option value="">Select Region (Austria only)</option>
+                                <option value="">Region (If Country is Austria)</option>
                                 @foreach($austrianRegions as $id => $name)
                                     <option value="{{ $id }}" {{ request('region_id') == $id ? 'selected' : '' }}>{{ $name }}</option>
                                 @endforeach
@@ -182,19 +184,32 @@
                                     </h5>
                                 </div>
                                 <div class="card-body">
-                                    <p class="card-text">
+                                    {{-- <p class="card-text">
                                         <a href="mailto:{{ $user->email }}" class="contact-btn">Contact Me</a>
+                                    </p> --}}
+                                    <p class="card-text">
+                                        @if ($user->person && $user->person->preferred_contact_method === 'phone' && $user->person->phone)
+                                            <a href="https://wa.me/{{ preg_replace('/\D/', '', $user->person->phone) }}"
+                                            target="_blank" class="contact-btn">
+                                            Contact via WhatsApp
+                                            </a>
+                                        @else
+                                            <a href="mailto:{{ $user->email }}" class="contact-btn">
+                                            Contact via Email
+                                            </a>
+                                        @endif
                                     </p>
+
                                     @if(request('region_id'))
                                         <p class="card-text"><strong>Location:</strong>
                                             {{ $austrianRegions[request('region_id')] ?? 'Unknown' }}
                                         </p>
                                     @endif
                                     @php
-                                        $skill = $user->skills->firstWhere('skill_name', $selectedSkill);
-                                        $photos = $skill ? ($skill->sample_pictures ?? []) : [];
-                                        $price = $skill ? ($skill->price ?? null) : null;
-                                        $description = $skill ? ($skill->description ?? null) : null;
+            $skill = $user->skills->firstWhere('skill_name', $selectedSkill);
+            $photos = $skill ? ($skill->sample_pictures ?? []) : [];
+            $price = $skill ? ($skill->price ?? null) : null;
+            $description = $skill ? ($skill->description ?? null) : null;
                                     @endphp
                                     @if ($price)
                                         <p class="card-text"><strong>Price:</strong>
@@ -257,7 +272,7 @@
             <div class="features-content">
                 <span class="box1"><span aria-hidden="true" class="icon-dial"></span></span>
                 <h3>Create An Account</h3>
-                <p>Create your account quickly and securely using your email address and password.</p>
+                <p>Do you have a Skill or Service to Offer? Create your account quickly and securely using your email address and password.</p>
             </div>
         </div>
 

@@ -10,32 +10,11 @@
     <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('css/main.css') }}">
     <style>
-        .terms {
-            padding: 60px 0;
-            background-color: #fff;
-        }
-        .terms h2 {
-            font-size: 32px;
-            color: #242c36;
-            margin-bottom: 20px;
-            font-weight: bold;
-        }
-        .terms h3 {
-            font-size: 24px;
-            color: #242c36;
-            margin-top: 30px;
-            margin-bottom: 15px;
-        }
-        .terms p, .terms li {
-            font-size: 16px;
-            color: #666;
-            line-height: 1.8;
-            margin-bottom: 10px;
-        }
-        .terms ul {
-            padding-left: 20px;
-            margin-bottom: 20px;
-        }
+        .terms { padding: 60px 0; background-color: #fff; }
+        .terms h2 { font-size: 32px; color: #242c36; margin-bottom: 20px; font-weight: bold; }
+        .terms h3 { font-size: 24px; color: #242c36; margin-top: 30px; margin-bottom: 15px; }
+        .terms p, .terms li { font-size: 16px; color: #666; line-height: 1.8; margin-bottom: 10px; }
+        .terms ul { padding-left: 20px; margin-bottom: 20px; }
     </style>
 </head>
 <body>
@@ -46,41 +25,57 @@
         <div class="container">
             <h2>Terms & Conditions</h2>
             <p><strong>Effective Date:</strong> {{ date('F d, Y') }}</p>
-            <p>Welcome to SkillProFinder. By accessing or using our website or services, you agree to be bound by the following terms and conditions. Please read them carefully.</p>
+            <p>Welcome to SkillProFinder. By accessing or using our website or services, you agree to be bound by these Terms & Conditions in compliance with EU law. Please read them carefully.</p>
 
             <h3>1. Acceptance of Terms</h3>
-            <p>By registering, browsing, or using SkillProFinder, you confirm that you agree to these Terms & Conditions and our Privacy Policy.</p>
+            <p>By registering, browsing, or using SkillProFinder, you confirm that you agree to these Terms & Conditions and our <a href="/privacy-policy">Privacy Policy</a>, in accordance with the General Data Protection Regulation (GDPR).</p>
 
             <h3>2. Eligibility</h3>
-            <p>To use SkillProFinder, you must be at least 18 years old or have the legal capacity to form a binding agreement in your country of residence.</p>
+            <p>You must be at least 18 years old or have the legal capacity to enter into a binding agreement under the laws of your country of residence.</p>
 
             <h3>3. User Accounts</h3>
             <ul>
-                <li>You are responsible for maintaining the confidentiality of your account and password.</li>
-                <li>You agree to provide accurate and up-to-date information when creating your profile.</li>
+                <li>You are responsible for maintaining the confidentiality of your login details.</li>
+                <li>You must provide accurate and truthful information when creating your profile.</li>
+                <li>You must notify us immediately if you suspect unauthorized use of your account.</li>
             </ul>
 
-            <h3>4. Service Listings</h3>
+            <h3>4. Services & Listings</h3>
             <ul>
-                <li>You may list only skills or services you are qualified to offer.</li>
-                <li>All content you post must be respectful, legal, and not misleading.</li>
-                <li>SkillProFinder reserves the right to remove any content deemed inappropriate or harmful.</li>
+                <li>Only skills or services you are qualified to offer may be listed.</li>
+                <li>Content posted must not be unlawful, misleading, discriminatory, or infringe intellectual property rights.</li>
+                <li>We reserve the right to remove content that violates EU laws or these Terms.</li>
             </ul>
 
-            <h3>5. Payment & Transactions</h3>
+            <h3>5. Payments & Transactions</h3>
             <ul>
-                <li>SkillProFinder does not handle payments between users at this stage. Transactions are carried out directly between clients and service providers.</li>
-                <li>In the future, SkillProFinder may offer secure payment features with relevant terms.</li>
+                <li>Currently, SkillProFinder does not process payments. Transactions are handled directly between clients and providers.</li>
+                <li>When integrated, payment processing will comply with EU PSD2 (Payment Services Directive) and consumer protection rules.</li>
             </ul>
 
-            <h3>6. Limitations of Liability</h3>
-            <p>SkillProFinder is not liable for any direct or indirect damage or loss resulting from interactions between users, including disputes or service issues. Always use due diligence.</p>
+            <h3>6. Data Protection & Privacy</h3>
+            <p>We process personal data in accordance with the <strong>General Data Protection Regulation (GDPR)</strong>. For details on how your data is collected, used, and stored, please refer to our <a href="/privacy-policy">Privacy Policy</a>.</p>
 
-            <h3>7. Termination</h3>
-            <p>We reserve the right to suspend or delete user accounts that violate our policies or engage in harmful behavior on the platform.</p>
+            <h3>7. Consumer Rights</h3>
+            <p>If you are a consumer within the EU, you may have specific rights under the <strong>EU Consumer Rights Directive</strong>, including withdrawal rights for certain digital services.</p>
 
-            <h3>8. Changes to Terms</h3>
-            <p>These Terms may be updated at any time. Continued use of the platform constitutes your acceptance of any changes.</p>
+            <h3>8. Limitation of Liability</h3>
+            <p>SkillProFinder is not liable for disputes, losses, or damages arising from interactions between users. Users are encouraged to perform due diligence before entering agreements.</p>
+
+            <h3>9. Intellectual Property</h3>
+            <p>All trademarks, logos, and platform content belong to SkillProFinder unless otherwise stated. You may not reproduce, modify, or distribute without prior consent.</p>
+
+            <h3>10. Termination</h3>
+            <p>We may suspend or terminate accounts that breach these Terms, EU law, or engage in fraudulent or harmful activities.</p>
+
+            <h3>11. Changes to Terms</h3>
+            <p>We may update these Terms to reflect changes in law or platform features. Continued use of the service implies acceptance of the latest version.</p>
+
+            <h3>12. Governing Law & Jurisdiction</h3>
+            <p>These Terms are governed by the laws of the European Union and the Member State in which you reside. Disputes shall be subject to the competent courts of that jurisdiction.</p>
+
+            <h3>13. Contact Information</h3>
+            <p>If you have questions or concerns about these Terms, please contact us at: <a href="mailto:support@skillprofinder.com">support@skillprofinder.com</a>.</p>
         </div>
     </section>
 

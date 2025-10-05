@@ -14,7 +14,7 @@
                 <address>
                     <ul class="footer-links">
                         <li>Email: <a href="mailto:info@skillprofinder.com" aria-label="Email SkillProFinder support">info@skillprofinder.com</a></li>
-                        <li>WhatsApp: <a href="https://wa.me/2349023250180" target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp +2349023250180">+2349023250180</a></li>
+                        {{-- <li>WhatsApp: <a href="https://wa.me/2349023250180" target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp +2349023250180">+2349023250180</a></li> --}}
                     </ul>
                 </address>
             </div>
@@ -26,7 +26,7 @@
                     <li><a href="{{ route('home') }}#faq" aria-label="Frequently Asked Questions">FAQ</a></li>
                     <li><a href="{{ route('terms') }}" aria-label="Terms and Conditions">Terms & Conditions</a></li>
                     <li><a href="{{ route('privacy') }}" aria-label="Privacy Policy">Privacy Policy</a></li>
-                   
+
                 </ul>
             </div>
         </div>

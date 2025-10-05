@@ -164,20 +164,7 @@ class SkillCrudController extends CrudController
                 'disk' => 'public',
                 'path' => 'skills/pictures',
             ])
-            ->wrapper(['class' => 'form-group col-md-6']);
-
-        CRUD::field('sample_videos')
-            ->type('upload_multiple')
-            ->label('Sample Videos')
-            ->upload(true)
-            ->disk('public')
-            ->path('skills/videos')
-            ->multiple(true)
-            ->withFiles([
-                'disk' => 'public',
-                'path' => 'skills/videos',
-            ])
-            ->wrapper(['class' => 'form-group col-md-6']);
+            ->wrapper(['class' => 'form-group col-md-12']);
 
         // Handle user_id field differently for admins vs non-admins
         if (!backpack_user()->isAdmin()) {
@@ -231,11 +218,11 @@ class SkillCrudController extends CrudController
             ->view('crud::columns.multiple_images')
             ->disk('public')
             ->prefix('storage/');
-        CRUD::column('sample_videos')->type('view')
-            ->label('Sample Videos')
-            ->view('crud::columns.multiple_videos')
-            ->disk('public')
-            ->prefix('storage/');
+        // CRUD::column('sample_videos')->type('view')
+        //     ->label('Sample Videos')
+        //     ->view('crud::columns.multiple_videos')
+        //     ->disk('public')
+        //     ->prefix('storage/');
     }
 
     public function store(Request $request)

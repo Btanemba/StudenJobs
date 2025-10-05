@@ -25,23 +25,28 @@ class LoginController extends Controller
             // Load the authenticated user's person relationship
             $user = Auth::user()->load('person');
 
-             if (!$user->hasVerifiedEmail()) {
+            if (!$user->hasVerifiedEmail()) {
 
-            return redirect()->route('verification.notice');
-        }
+                return redirect()->route('verification.notice');
+            }
 
-            // Check if first_name, last_name, and gender exist
+            // Profile completeness check
             if (
                 !$user->person ||
                 empty($user->person->first_name) ||
-                empty($user->person->last_name)
-
+                empty($user->person->last_name) ||
+                empty($user->person->gender) ||
+                empty($user->person->street) ||
+                empty($user->person->number) ||
+                empty($user->person->city) ||
+                empty($user->person->zip)
             ) {
-                return redirect(route('user.edit', $user->id));
+                return redirect()->route('user.edit', $user->id);
             }
 
             // Update last_access timestamp
             $user->update(['last_access' => now()]);
+
 
             // Redirect to the admin user dashboard
             return redirect('admin/dashboard');

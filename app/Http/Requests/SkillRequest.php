@@ -32,8 +32,7 @@ class SkillRequest extends FormRequest
             'skill_level' => 'nullable|string|in:Beginner,Intermediate,Expert',
             'certification' => 'nullable|string|in:Yes,No',
            'sample_pictures' => 'nullable|array|max:3',
-            'sample_pictures.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:5048', // 2048 KB = 2MB
-            'sample_videos.*' => 'nullable|file|mimes:mp4,avi,mov|max:10240', // Allow multiple videos
+            'sample_pictures.*' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:5120',
 
         ];
     }

@@ -45,7 +45,7 @@ class User extends Authenticatable implements MustVerifyEmail
             }
 
             // Automatically create a person record
-            $user->person()->create([]);
+            //$user->person()->create([]);
         });
 
         static::updating(function ($user) {

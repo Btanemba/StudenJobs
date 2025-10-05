@@ -6,6 +6,9 @@ use App\Http\Requests\InvoiceRequest;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use Illuminate\Support\Str;
+use App\Mail\InvoiceUploadedMail;
+use Illuminate\Support\Facades\Mail;
+
 
 
 
@@ -21,6 +24,8 @@ class InvoiceCrudController extends CrudController
     use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
+    use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation { store as traitStore; }
+    use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation { update as traitUpdate; }
 
     /**
      * Configure the CrudPanel object. Apply settings to all operations.
@@ -132,6 +137,8 @@ class InvoiceCrudController extends CrudController
             'entity' => 'person', // The relationship name in the Invoice model
             'attribute' => 'full_name', // The attribute to display (add this accessor to Person model if needed)
             'model' => \App\Models\Person::class, // The model to fetch options from
+            'allows_null' => true,
+
         ]);
         // Invoice number (auto-generated or manual)
         $this->crud->addField([
@@ -199,7 +206,7 @@ class InvoiceCrudController extends CrudController
         ]);
 
         CRUD::addField([
-            'name'  => 'created_by_name', // Uses the accessor name in the Model
+            'name'  => 'created_by_name',
             'label' => ('Created By'),
             'type'  => 'text',
             'wrapper' => ['class' => 'form-group col-md-3'],
@@ -267,4 +274,25 @@ class InvoiceCrudController extends CrudController
     {
         $this->setupCreateOperation();
     }
+
+  public function store(InvoiceRequest $request)
+{
+
+    $response = $this->traitStore($request);
+
+    // Get the saved invoice
+    $invoice = $this->crud->entry;
+
+    // Send notification email if invoice belongs to a user
+    if ($invoice && $invoice->person && $invoice->person->user) {
+        $user = $invoice->person->user;
+        if ($user && $user->email) {
+            Mail::to($user->email)->send(new InvoiceUploadedMail($invoice));
+        }
+    }
+
+    return $response;
+}
+
+
 }

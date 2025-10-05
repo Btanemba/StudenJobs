@@ -19,7 +19,7 @@ class Person extends Model
         'phone', 'remark', 'university_name', 'university_address', 'start_year', 'finish_year',
         'student_id_picture_front', 'student_id_picture_back', 'user_id', 'payment_plan',
         'profile_picture','valid_till', 'created_by',
-        'updated_by',
+        'updated_by','preferred_contact_method',
     ];
 
     // Define the relationship with the User model
