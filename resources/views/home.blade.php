@@ -4,6 +4,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/main.css">
+   
+
     <style>
         .modal-content {
             border-radius: 8px;
@@ -29,8 +31,7 @@
             display: inline-block;
             color: #fff;
         }
-
-
+     
         .modal-body.package-price {
             text-align: center;
             padding: 30px;
@@ -319,7 +320,7 @@ $countries = collect([
                 <div class="package-box">
                     <div class="package-header">
                         <i class="fa fa-cog" aria-hidden="true"></i>
-                        <h3>Monthly</h3>
+                       <h3 style="color: white;">Monthly</h3>
                     </div>
                     <div class="package-price">
                         <h2>Student <sup>€</sup>10</h2>
@@ -333,7 +334,7 @@ $countries = collect([
                 <div class="package-box">
                     <div class="package-header">
                         <i class="fa fa-star-half-o" aria-hidden="true"></i>
-                        <h3>6-Months</h3>
+                        <h3 style="color: white;">6-Months</h3>
                     </div>
                     <div class="package-price">
                         <h2>Student <sup>€</sup>50</h2>
@@ -347,7 +348,7 @@ $countries = collect([
                 <div class="package-box">
                     <div class="package-header">
                         <i class="fa fa-cube" aria-hidden="true"></i>
-                        <h3>Yearly</h3>
+                        <h3 style="color: white;">Yearly</h3>
                     </div>
                     <div class="package-price">
                         <h2>Student <sup>€</sup>100</h2>
